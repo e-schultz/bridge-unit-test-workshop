@@ -1,11 +1,18 @@
-import React, { useState } from "react";
-import styles from "./SearchBar.module.css";
+import React, { useState } from 'react';
+import styles from './SearchBar.module.css';
 
-function SearchBar({ initialQuery, onSearch }) {
+function SearchBar({ initialQuery = '', onSearch }) {
   let [query, setQuery] = useState(initialQuery);
+  let [showError, setShowError] = useState(false);
+
   let handleSubmit = (event) => {
     event.preventDefault();
-    onSearch(query);
+    if (query.trim().length === 0) {
+      setShowError(true);
+    } else {
+      setShowError(false);
+      onSearch(query);
+    }
   };
   return (
     <form onSubmit={handleSubmit}>
@@ -14,11 +21,13 @@ function SearchBar({ initialQuery, onSearch }) {
         <input
           id="search-query"
           value={query}
-          onChange={(event) => {
-            setQuery(event.target.value);
-          }}
+          onChange={(evt) => setQuery(evt.target.value)}
         />
+
         <button type="submit">Search</button>
+        {showError ? (
+          <div aria-label="search-term-required">Please enter search field</div>
+        ) : null}
       </div>
     </form>
   );

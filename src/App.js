@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
 import HackerNewsSearch from './components/HackerNewsSearch';
-import SearchBarX from './components/SearchBar';
-import SearchBar from './components/SearchBarCls';
+import SearchBar from './components/SearchBar';
+import SearchBarX from './components/SearchBarCls';
 
 class App extends Component {
   constructor() {

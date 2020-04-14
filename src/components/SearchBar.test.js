@@ -1,10 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import TestUtils from 'react-dom/test-utils';
+// import TestUtils from 'react-dom/test-utils';
 import { act, fireEvent, render } from '@testing-library/react';
 import TestRenderer from 'react-test-renderer';
 import SearchBar from './SearchBar';
 import SearchBarX from './SearchBarCls';
+
 describe('Search Bar Functionality', () => {
   test('should set the search input field to the provided initialQuery', () => {
     const div = document.createElement('div');
@@ -62,5 +63,48 @@ describe('Search Bar Functionality', () => {
 
     expect(onSearch).toHaveBeenCalled();
     expect(onSearch).toHaveBeenCalledWith('New Search');
+  });
+
+  it('should display warning if the search field is blank', () => {
+    const onSearch = jest.fn();
+
+    const { getByLabelText } = render(
+      <SearchBar initialQuery="Initial Query" onSearch={onSearch} />
+    );
+
+    fireEvent.change(getByLabelText(/search:/i), {
+      target: { value: '' },
+    });
+    fireEvent.submit(getByLabelText(/search:/i));
+
+    // this is an ok start, but it only tells us that it has been called
+    // knowing what has been passed in is more important
+    // what if there is an error in our code that isn't getting the correct field value?
+
+    expect(getByLabelText('search-term-required')).toHaveTextContent(
+      'Please enter search field'
+    );
+    expect(onSearch).not.toBeCalled();
+  });
+
+  it('should display warning if the user enters spaces and no value', () => {
+    // what if a user enters a string of just spaces
+    // create a test for the failing condition
+    // then fix it
+    const onSearch = jest.fn();
+
+    const { getByLabelText } = render(
+      <SearchBar initialQuery="Initial Query" onSearch={onSearch} />
+    );
+
+    fireEvent.change(getByLabelText(/search:/i), {
+      target: { value: ' ' },
+    });
+    fireEvent.submit(getByLabelText(/search:/i));
+
+    expect(getByLabelText('search-term-required')).toHaveTextContent(
+      'Please enter search field'
+    );
+    expect(onSearch).not.toBeCalled();
   });
 });
