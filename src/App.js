@@ -8,7 +8,7 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      query: 'react',
+      query: 'redux',
     };
   }
   handleSearch(event) {
