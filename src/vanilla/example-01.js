@@ -9,11 +9,13 @@ const findProductName = (productId, products) => {
 };
 
 const sortByCost = (a, b) => a.cost - b.cost;
+
 const sortInventory = (items) => {
   return [...items].sort(sortByCost);
 };
+
 const getProductsWithName = (items, products) => {
-  const productMap = arrayToMap('id', 'description', products);
+  // const productMap = arrayToMap('id', 'description', products);
   return items.map((item) => {
     return {
       ...item,
@@ -21,6 +23,7 @@ const getProductsWithName = (items, products) => {
     };
   });
 };
+
 const getProductsWithNameX = (items, products) => {
   const productMap = arrayToMap('id', 'description', products);
   return items.map((item) => {
@@ -30,15 +33,17 @@ const getProductsWithNameX = (items, products) => {
     };
   });
 };
+
 const getCheapestAndMostExpensiveByCategory = (categoryId, data) => {
   const { inventory } = data;
   // we don't want to mutate the source array
   const sorted = sortInventory(inventory);
   const filtered = filterByCategory(categoryId, sorted);
-  const filteredWithName = getProductsWithNameX(filtered, data.products);
+  const filteredWithName = getProductsWithName(filtered, data.products);
 
   return [filteredWithName[0], filteredWithName[filteredWithName.length - 1]];
 };
+
 const filterByCategory = (categoryId, items) => {
   return items.filter((item) => item.categoryId === categoryId);
 };
@@ -53,6 +58,11 @@ const arrayToMap = (keyProp, valueProp, array) => {
 const getProductMap = (products) => {
   return arrayToMap('id', 'description', products);
 };
+
+const getCategoryMap = (categories) => {
+  return arrayToMap('id', 'categoryDescription', categories);
+};
+
 const getCheapestAndMostExpensiveByCategoryX = (categoryId, data) => {
   const { inventory } = data;
   const productMap = getProductMap(data.products);
@@ -67,9 +77,30 @@ const getCheapestAndMostExpensiveByCategoryX = (categoryId, data) => {
   return [sortedInventory[0], sortedInventory[sortedInventory.length - 1]];
 };
 
+const getProductsByCategory = (categoryId, data) => {
+  const productMap = getProductMap(data.products);
+  const categoryMap = getCategoryMap(data.categories);
+  return data.inventory
+    .filter((product) => product.categoryId === categoryId)
+    .map((product) => {
+      return {
+        ...product,
+        description: productMap[product.productId],
+        category: categoryMap[product.categoryId],
+      };
+    });
+};
+
+const getProductIdsByCategory = (categoryId, data) => {
+  return data.inventory
+    .filter((item) => item.categoryId === categoryId)
+    .map(({ id }) => id);
+};
 export {
   getCheapestAndMostExpensiveByCategory,
   getCheapestAndMostExpensiveByCategoryX,
   findProductName,
   arrayToMap,
+  getProductsByCategory,
+  getProductIdsByCategory,
 };
