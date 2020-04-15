@@ -30,8 +30,8 @@ export class SearchBar extends React.Component {
             id="search-query"
             value={this.state.query}
             onChange={(event) => {
-              this.setQuery(event.target.value);
-              // this.setQuery({ query: event.target.value });
+              this.setQuery({ query: event.target.value });
+              // this.setQuery(event.target.value);
             }}
           />
           <button type="submit">Search</button>

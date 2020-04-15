@@ -4,7 +4,54 @@ import SearchResultsList from './SearchResultList';
 // replace UL with <SearchResultsList results={results}/>
 const API = 'https://hn.algolia.com/api/v1/search?';
 
-/*
+function HackerNewsSearch({ query }) {
+  // const [results, isLoading] = useHackerNews(query);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [results, setResults] = useState([]);
+  useEffect(() => {
+    setIsLoading(true);
+    axios
+      .get(`${API}query=${query}`)
+      .then((result) => result.data)
+      .then(({ hits }) => {
+        setIsLoading(false);
+        setResults(hits);
+      });
+  }, [query]);
+
+  return (
+    <section>
+      {isLoading ? (
+        <div data-testid="loadingPlaceholder">
+          ...... please wait while searching for {query}{' '}
+        </div>
+      ) : (
+        <ul aria-label="results">
+          {results.map((result) => {
+            return (
+              <li key={result.objectID}>
+                <a
+                  aria-label={`Read more about ${result.title}`}
+                  href={result.url}
+                >
+                  {result.title}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+export default HackerNewsSearch;
+
+/* ---- code down here is for snippets / copy-paste as I go through examples
+ 
+SearchResults before component:
+
 <ul aria-label="results">
           {results.map((result) => {
             return (
@@ -19,8 +66,12 @@ const API = 'https://hn.algolia.com/api/v1/search?';
             );
           })}
         </ul>
-        */
-function HackerNewsSearch({ query }) {
+  
+using search results
+<SearchResultsList results={results} />
+
+
+function useHackerNews(query) {
   const [isLoading, setIsLoading] = useState(true);
   const [results, setResults] = useState([]);
   useEffect(() => {
@@ -33,17 +84,8 @@ function HackerNewsSearch({ query }) {
         setResults(hits);
       });
   }, [query]);
-  return (
-    <section>
-      {isLoading ? (
-        <div data-testid="loadingPlaceholder">
-          ...... please wait while searching for {query}{' '}
-        </div>
-      ) : (
-        <SearchResultsList results={results} />
-      )}
-    </section>
-  );
+  return [results, isLoading];
 }
 
-export default HackerNewsSearch;
+// const [results, isLoading] = useHackerNews(query);
+*/

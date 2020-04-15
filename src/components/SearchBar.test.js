@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-// import TestUtils from 'react-dom/test-utils';
+import TestUtils from 'react-dom/test-utils';
 import { act, fireEvent, render } from '@testing-library/react';
 import TestRenderer from 'react-test-renderer';
 import SearchBar from './SearchBar';
@@ -16,6 +16,7 @@ describe('Search Bar Functionality', () => {
       'Initial Query'
     );
   });
+
   // ReactDOM.render will return a HTML element/document fragment - and we
   // can use query selectors to query the dom and validate the values
   // however, using react-testing-library - some of the boilerplate
@@ -63,26 +64,51 @@ describe('Search Bar Functionality', () => {
     // this is an ok start, but it only tells us that it has been called
     // knowing what has been passed in is more important
     // what if there is an error in our code that isn't getting the correct field value?
-    expect(onSearch).toHaveBeenCalled();
     expect(onSearch).toHaveBeenCalledWith('New Search');
   });
 
   // testing how it's used vs implementation details
-  test.skip('should avoid testing implementation details 1', () => {
+  // I've introduced a bug into a class based version of SearchBarX
+  test('should avoid testing implementation details 1', () => {
     const onSearch = jest.fn();
-    let root;
-    root = TestRenderer.create(
-      <SearchBar onSearch={onSearch} initialQuery="Initial Query" />
+
+    const testRenderer = TestRenderer.create(
+      <SearchBarX onSearch={onSearch} initialQuery="Initial Query" />
     );
     // if we change this to a functional component that uses hooks
     // instead of a class based one - there is no longer an an `instance` to return
-    root.getInstance().setQuery('New Search');
-    root.getInstance().handleSubmit({ preventDefault: () => {} });
+    // note: update App.js to use the class based version of the SearchBar component
+    // if we view in the browser - things are breaking, but the unit test is still passing
+
+    testRenderer.getInstance().setQuery('New Search');
+    testRenderer.getInstance().handleSubmit({ preventDefault: () => {} });
 
     expect(onSearch).toHaveBeenCalled();
     expect(onSearch).toHaveBeenCalledWith('New Search');
   });
 
+  test.skip('should avoid testing implementation details 2', () => {
+    const div = document.createElement('div');
+    const onSearch = jest.fn();
+
+    ReactDOM.render(
+      <SearchBarX onSearch={onSearch} initialQuery="Initial Query" />,
+      div
+    );
+    // if we change this to a functional component that uses hooks
+    // instead of a class based one - there is no longer an an `instance` to return
+    // note: update App.js to use the class based version of the SearchBar component
+    // if we view in the browser - things are breaking, but the unit test is still passing
+
+    let input = div.querySelector('input');
+
+    TestUtils.Simulate.change(input, { target: { value: 'New Search' } });
+    TestUtils.Simulate.submit(input, {});
+    //// testRenderer.getInstance().setQuery('New Search');
+    // testRenderer.getInstance().handleSubmit({ preventDefault: () => {} });
+
+    expect(onSearch).toHaveBeenCalledWith('New Search');
+  });
   it('should display warning if the search field is blank', () => {
     const onSearch = jest.fn();
 

@@ -19,7 +19,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <SearchBar
+        <SearchBarX
           initialQuery={this.state.query}
           onSearch={(event) => this.handleSearch(event)}
         />
