@@ -8,21 +8,38 @@ import SearchBarX from './SearchBarCls';
 
 describe('Search Bar Functionality', () => {
   test('should set the search input field to the provided initialQuery', () => {
+    // For component unit tests - we will need to render the component,
+    // we can do this using React.render and attaching it to a div element
     const div = document.createElement('div');
     ReactDOM.render(<SearchBar initialQuery="Initial Query" />, div);
-    expect(div.querySelector('input').value).toBe('Initial Query');
+    expect(div.querySelector('[data-test-id=search-query]').value).toBe(
+      'Initial Query'
+    );
+  });
+  // ReactDOM.render will return a HTML element/document fragment - and we
+  // can use query selectors to query the dom and validate the values
+  // however, using react-testing-library - some of the boilerplate
+  // can be simplified, and also get extra functionality
+
+  test.skip('should set the search input field to the provided initialQuery - react testing lib', () => {
+    // using react-testing-lib, we get a few helpers to help reduce the boilerplate, and also
+    // a number of queries to make it easy to access the dom, and give us more useful
+    // error messages
+    const { getByTestId } = render(<SearchBar initialQuery="Initial Query" />);
+    // on the first run, this should fail - we used the wrong
+    // attribute for the data-test-id
+    // if we fix that, we can see our previous test failing, and compare the output to what we see here
+    expect(getByTestId('search-query').value).toBe('Initial Query');
+    // change data-test-id="search-query" to data-testid="search-query"
   });
 
   test('should call the provided onSearch callback when the form is submitted with the input value', () => {
     const onSearch = jest.fn();
-    const div = document.createElement('div');
-    ReactDOM.render(
-      <SearchBar initialQuery="Initial Query" onSearch={onSearch} />,
-      div
+    const { getByTestId } = render(
+      <SearchBar initialQuery="Initial Query" onSearch={onSearch} />
     );
-    const form = div.querySelector('form');
 
-    fireEvent.submit(form, { preventDefault: () => {} });
+    fireEvent.submit(getByTestId('search-form'), { preventDefault: () => {} });
     // this is an ok start, but it only tells us that it has been called
     // knowing what has been passed in is more important
     // what if there is an error in our code that isn't getting the correct field value?
@@ -49,6 +66,7 @@ describe('Search Bar Functionality', () => {
     expect(onSearch).toHaveBeenCalled();
     expect(onSearch).toHaveBeenCalledWith('New Search');
   });
+
   // testing how it's used vs implementation details
   test.skip('should avoid testing implementation details 1', () => {
     const onSearch = jest.fn();

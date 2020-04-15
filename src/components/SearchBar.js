@@ -15,11 +15,12 @@ function SearchBar({ initialQuery = '', onSearch }) {
     }
   };
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} data-testid="search-form">
       <div className={styles.searchStyle}>
         <label htmlFor="search-query">Search:</label>
         <input
           id="search-query"
+          data-test-id="search-query"
           value={query}
           onChange={(evt) => setQuery(evt.target.value)}
         />

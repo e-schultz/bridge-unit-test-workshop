@@ -32,7 +32,7 @@ class HackerNewsSearch extends React.Component {
 
   render() {
     let { results, isLoading } = this.state;
-    let { query } = this.props.query;
+    let { query } = this.props;
     return (
       <section>
         {isLoading ? (

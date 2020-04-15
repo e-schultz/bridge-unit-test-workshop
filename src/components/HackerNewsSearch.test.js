@@ -1,13 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 //import '@testing-library/jest-dom/extend-expect';
-import { act, fireEvent, render } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import TestRenderer from 'react-test-renderer';
-import HackerNewsSearch from './HackerNewsSearch';
-import HackerNewsSearchX from './HackerNewsSearchCls';
+import HackerNewsSearchX from './HackerNewsSearch';
+import HackerNewsSearch from './HackerNewsSearchCls';
 import axios from 'axios';
 jest.mock('axios');
-
+jest.useFakeTimers();
 // uncomment to show how to mock out a child component for a shallow render
 /* 
 jest.mock('./SearchResultList.js', () => {
@@ -18,13 +18,14 @@ describe('the hacker news search', () => {
   test('should display a placeholder while waiting for the results', async () => {
     const promise = Promise.resolve();
     axios.get.mockResolvedValueOnce({ data: { hits: [] } });
-    const element = render(<HackerNewsSearch query="react" />);
+    const { getByTestId } = render(<HackerNewsSearch query="react" />);
     // how can we see what the render markup will look like?
     // bug using the debug that is returned by render
     // element.debug();
     // we can import '@testing-library/jest-dom/extend-expect';
     // to extend expect with helpers to make common things easier
-    expect(element.getByTestId('loadingPlaceholder')).toHaveTextContent(
+    //
+    expect(getByTestId('loadingPlaceholder')).toHaveTextContent(
       '...... please wait while searching for react'
     );
     // the promise wont be 'settled' before this point
@@ -35,7 +36,6 @@ describe('the hacker news search', () => {
   test('should display results once returned from the API', async () => {
     // https://kentcdodds.com/blog/fix-the-not-wrapped-in-act-warning
 
-    const promise = Promise.resolve();
     axios.get.mockResolvedValueOnce({
       data: {
         hits: [
@@ -47,10 +47,12 @@ describe('the hacker news search', () => {
         ],
       },
     });
-    const element = render(<HackerNewsSearch query="react" />);
+    const { getByLabelText } = render(<HackerNewsSearch query="react" />);
+    // advance the timers by a second to kick off the first request
+    act(() => jest.advanceTimersByTime(1000));
 
-    await act(() => promise);
-    const link = element.getByLabelText(/read more about some title/i);
+    expect(await screen.findByText(/some title/i)).toBeInTheDocument();
+    const link = getByLabelText(/read more about some title/i);
     expect(link).toHaveTextContent('some title');
     expect(link).toHaveAttribute('href', 'https://someurl.com');
 
