@@ -7,8 +7,11 @@ import SearchBar from '../components/SearchBar';
 import SearchBarX from '../components/SearchBarCls';
 
 describe('Search Bar Functionality', () => {
-  // For component unit tests - we will need to render the component,
-  // we can do this using React.render and attaching it to a div element
+  // When testing components, we generally need to do a few things:
+  // * Render the component
+  // * Get access to the instance, or DOM
+  // * Validate what's in the component - by querying the dom, or other utilities
+
   test('should set the search input field to the provided initialQuery', () => {
     const div = document.createElement('div');
     const expected = 'Initial Query';
@@ -17,49 +20,81 @@ describe('Search Bar Functionality', () => {
     expect(actual).toBe(expected);
   });
 
-  // using react-testing-lib, we get a few helpers to help reduce the boilerplate, and also
-  // a number of queries to make it easy to access the dom, and give us more useful
-  // error messages
+  // React does have some built in testing utilities, but there can be a bit of boilerplate.
+  // To help with this, we can use a library called react-testing-lib
+  //
+  // if not already installed - will need to add the packages
+  // * @testing-library/jest-dom
+  // * @testing-library/react"
+  // * @testing-library/user-event"
+  //
+  // More documentation is available at: https://testing-library.com/docs/react-testing-library/intro
+  // * render docs: - https://testing-library.com/docs/react-testing-library/api#render-result
+  // * getByTestId: - https://testing-library.com/docs/dom-testing-library/api-queries#bytestid
+  test('should set the search input field to the provided initialQuery - react testing lib', () => {
+    const expected = 'Initial Query';
 
-  test.skip('should set the search input field to the provided initialQuery - react testing lib', () => {
-    const { getByTestId } = render(<SearchBar initialQuery="Initial Query" />);
-    // on the first run, this should fail - we used the wrong
-    // attribute for the data-test-id
-    // if we fix that, we can see our previous test failing, and compare the output to what we see here
-    expect(getByTestId('search-query').value).toBe('Initial Query');
-    // change data-test-id="search-query" to data-testid="search-query"
+    // TODO: complete test, and make use of getByTestId and render
+    const actual = 'Initial Query';
+
+    expect(actual).toBe(expected);
   });
 
+  // Testing Form Events
+  // docs: https://testing-library.com/docs/dom-testing-library/api-events
+  //
+  // When testing components, forms, etc - we want to get as close as we can to
+  // how things are working in the application. To do this, we need to trigger DOM
+  // events.
+  //
+  // react testing library has a helper called `fireEvent`
+  //
+  test('should update the input as the user types', () => {
+    const expected = 'New Value';
+    const actual = 'New Value';
+    expect(actual).toEqual(expected);
+  });
+
+  // Our SearchBar takes two props - initialQuery, and onSearch
+  // the onSearch is a callback, and we want to verify that it
+  // is getting called when the form is submitted
+  //
+  // * creating a mock function with jest.fn
+  // * submitting the form
+  // * verify it was called, and what it was called with
+  //
+  // jest mock docs: https://jestjs.io/docs/en/mock-function-api
   test('should call the provided onSearch callback when the form is submitted with the input value', () => {
     const onSearch = jest.fn();
-    const { getByTestId } = render(
-      <SearchBar initialQuery="Initial Query" onSearch={onSearch} />
-    );
 
-    fireEvent.submit(getByTestId('search-form'), { preventDefault: () => {} });
-    // this is an ok start, but it only tells us that it has been called
-    // knowing what has been passed in is more important
-    // what if there is an error in our code that isn't getting the correct field value?
+    onSearch('Initial Query');
+
     expect(onSearch).toHaveBeenCalled();
     expect(onSearch).toHaveBeenCalledWith('Initial Query');
   });
 
+  // https://testing-library.com/docs/react-testing-library/cheatsheet
+
+  // Another feature we need to test, is ensuring that
+  // When the input value changes, that the onSearch is called with the new value
+  // For this we will need to
+  //
+  // * render the component
+  // * trigger a change
+  // * submit the form
+  // * verify that the callback was called with the correct value
   test('should call the provided onSearch with updated value if input has changed', () => {
-    // https://testing-library.com/docs/react-testing-library/cheatsheet
     const onSearch = jest.fn();
 
-    const element = render(
+    const { getByLabelText } = render(
       <SearchBar initialQuery="Initial Query" onSearch={onSearch} />
     );
 
-    fireEvent.change(element.getByLabelText(/search:/i), {
+    fireEvent.change(getByLabelText(/search:/i), {
       target: { value: 'New Search' },
     });
-    fireEvent.submit(element.getByLabelText(/search:/i));
+    fireEvent.submit(getByLabelText(/search:/i));
 
-    // this is an ok start, but it only tells us that it has been called
-    // knowing what has been passed in is more important
-    // what if there is an error in our code that isn't getting the correct field value?
     expect(onSearch).toHaveBeenCalledWith('New Search');
   });
 
