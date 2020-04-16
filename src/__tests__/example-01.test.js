@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {
   getCheapestAndMostExpensiveByCategoryX,
   getCheapestAndMostExpensiveByCategory,
@@ -66,27 +67,14 @@ const DATA = {
 };
 
 describe('avoid testing implementation details', () => {
+  // Given the data above, we know that Apples are the cheapest
+  // and Bannas are the most expensive.
+  //
+  // Knowing this, we can arrange our test to verify that those are the results
+  // that get returned.
   test('should get the cheapest and most expensive item', () => {
-    // given the data we are passing in - we know that apples will be the cheapest
-    // and Banannas the most expensive
-    const expectedMin = {
-      id: 1,
-      categoryId: 1,
-      quantity: 1,
-      productId: 1,
-      cost: 1,
-      description: 'Apples',
-    };
-    const expectedMax = {
-      id: 2,
-      categoryId: 1,
-      quantity: 10,
-      productId: 2,
-      cost: 2,
-      description: 'Banannas',
-    };
-
-    expect(1).toBe(1);
+    // TODO: implement
+    expect(1).toEqual(1);
   });
 
   // for the 'helper' functions - should we export those to make them easier to test?
@@ -144,72 +132,59 @@ describe('avoid testing implementation details', () => {
     expect(max).toEqual(expectedMax);
   });
 
-  // However, some helper functions that could be reusable
-  // might be worth testing, for example,
-  // look at `arrayToMap` in the vanilla/example-01.js folder
-  // and also getProductMap
-
-  // getProductMap is very specific to an implementation detail,
-  //    however arrayToMap - this is pretty generic and reusable,
-  // and the kind of thing that could be pulled out to be reused in other areas
-  // writing a test for getProductMap may not bring much value,
-  // but arrayToMap could be useful
+  // However, some helper functions that could be reusable can be worth testing.
+  // For example:  compare `getProductMap` to `arrayToMap` in the vanilla/example-01.js folder
+  //
+  // * getProductMap is very specific to an implementation detail,
+  // * however arrayToMap - this is pretty generic and reusable,
+  //
+  // Which function would there be more value in writing a unit test for?
 
   test('should convert an array to an object, using the provided keyProp and valueProp', () => {
-    const array = [
-      { someId: '_123', someValue: 'My Value' },
-      { someId: '_456', someValue: 'Another Value' },
-    ];
-    const expected = {
-      _123: 'My Value',
-      _456: 'Another Value',
-    };
-
-    const actual = arrayToMap('someId', 'someValue', array);
-    expect(actual).toEqual(expected);
+    const expected = 1;
+    const actual = 1;
+    // TODO: proper test for arrayToMap 
+    // what is the expected input?
+    // what is the expected output?
+    expect(actual).toEqual(actual);
   });
 
+  // How do we handle a situation where the data returned, might have
+  // more information than we need to validate our test case?
+  //
+  // This can happen if requirements change, that may cause 
+  // additional data to be added to an object, and while writing
+  // tests for that new functionality can be useful, it can also
+  // cause existing tests to fail.
+  //
+  // we can use partial matchers to help solve this,
+  // https://jestjs.io/docs/en/expect#expectobjectcontainingobject
+  //
+  // To show this, we will update `getCheapestAndMostExpensiveByCategoryX` 
+  // to add the category name to the returned object.
   test('partial matchers', () => {
-    /*
-    sometimes an object may have more data than we care about to be able to validate
-    our test case, for example - what if we just wanted to validate
-    that it had the most and least expensive product, and didn't care about the product name?
-    */
+   
     const expectedMin = {
       id: 1,
       categoryId: 1,
+      quantity: 1,
       productId: 1,
       cost: 1,
+      description: 'Apples',
     };
     const expectedMax = {
       id: 2,
       categoryId: 1,
+      quantity: 10,
       productId: 2,
       cost: 2,
+      description: 'Banannas',
     };
-
     const [min, max] = getCheapestAndMostExpensiveByCategoryX(1, DATA);
 
-    // if we leave this as `toEqual` - this test is going to fail,
-    // because the actual values have extra data, although this test
-    // is concerned with having the right min and max priced items, not the product name
-    // jest has a number of matchers to help with partial matching of objects and arrays,
+    expect(min).toEqual(expectedMin);
+    expect(max).toEqual(expectedMax);
 
-    // https://jestjs.io/docs/en/expect#expectobjectcontainingobject
-
-    // expect(min).toEqual(expectedMin);
-    // expect(max).toEqual(expectedMax);
-
-    // this can be useful if our source/mock data changes over time
-    // and we don't want to keep breaking tests that have things change
-    // unrelated to what we are looking for
-
-    expect(min).toEqual(expect.objectContaining(expectedMin));
-    expect(max).toEqual(expect.objectContaining(expectedMax));
-
-    // for example, if we added a property to our source data,
-    // our initial tests would start failing, even though the thing
-    // we care about is still working
   });
 });
 

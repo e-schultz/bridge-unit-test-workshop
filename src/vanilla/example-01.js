@@ -1,11 +1,11 @@
 /* should we export these so we can test them? */
 // comment out and remove from export
-const findProductName = (productId, products) => {
+const findProductName = (productId, products = []) => {
   // return 'deprecated pretend we deleted';
+  const NOT_FOUND = `product not found for productId: ${productId}`;
+
   const product = products.find((product) => product.id === productId);
-  return product
-    ? product.description
-    : `product not found for productId: ${productId}`;
+  return product ? product.description : NOT_FOUND;
 };
 
 const findCategoryName = (categoryId, categories) => {
@@ -24,6 +24,9 @@ const sortInventory = (items) => {
 
 const getProductsWithName = (items, products) => {
   // const productMap = arrayToMap('id', 'description', products);
+  if (!products) {
+    return undefined;
+  }
   return items.map((item) => {
     return {
       ...item,
@@ -87,10 +90,17 @@ const getCategoryMap = (categories) => {
 
 const getCheapestAndMostExpensiveByCategory = (categoryId, data) => {
   const { inventory } = data;
+  const products = data.products || [];
   // we don't want to mutate the source array
   const sorted = sortInventory(inventory);
   const filtered = filterByCategory(categoryId, sorted);
-  const filteredWithName = getProductsWithName(filtered, data.products);
+  const filteredWithName = filtered.map((item) => {
+    const { description } = products.find(
+      (product) => product.id === item.productId
+    ) || { description: 'not found' };
+
+    return { ...item, description };
+  });
 
   return [filteredWithName[0], filteredWithName[filteredWithName.length - 1]];
 };
@@ -99,12 +109,13 @@ const getCheapestAndMostExpensiveByCategoryX = (categoryId, data) => {
   const { inventory } = data;
   const productMap = getProductMap(data.products);
 
-  // console.log(productMap);
-
   const sortedInventory = [...inventory]
     .filter((item) => item.categoryId === categoryId)
     .sort((a, b) => a.cost - b.cost)
-    .map((item) => ({ ...item, description: productMap[item.productId] }));
+    .map((item) => ({
+      ...item,
+      description: productMap[item.productId],
+    }));
 
   return [sortedInventory[0], sortedInventory[sortedInventory.length - 1]];
 };
