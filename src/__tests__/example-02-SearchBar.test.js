@@ -143,39 +143,36 @@ describe('Search Bar Functionality', () => {
     expect(onSearch).toHaveBeenCalledWith('New Search');
   });
 
+  // Testing new functionality - adding validation
+  // We are going to update the SearchBar to display a warning if the user
+  // tries to submit an empty search.
+  //
+  // * Add validation to SearchBar
+  // * Test should render component
+  // * Trigger a value change
+  // * Submit the form
+  // * Verify that the error text is being displayed
+
   it('should display warning if the search field is blank', () => {
     const onSearch = jest.fn();
 
-    const { getByLabelText } = render(
-      <SearchBar initialQuery="Initial Query" onSearch={onSearch} />
-    );
+    // implement test
 
-    fireEvent.change(getByLabelText(/search:/i), {
-      target: { value: '' },
-    });
-    fireEvent.submit(getByLabelText(/search:/i));
-
-    // this is an ok start, but it only tells us that it has been called
-    // knowing what has been passed in is more important
-    // what if there is an error in our code that isn't getting the correct field value?
-
-    expect(getByLabelText('search-term-required')).toHaveTextContent(
-      'Please enter search field'
-    );
     expect(onSearch).not.toBeCalled();
   });
 
-  // if a user only enters spaces, we want to treat that as a empty
-  // and not allow them to submit the search
-  // Step 1. Write a test that sets the value to an empty string of spaces & submits it
-  // Verify that the test is failing
-  // Step 2. Fix the handleSubmit to account for empty strings, and get the test passing
+  // How would we handle a user entering empty spaces?
+  //
+  // * Create a test to handle string of empty spaces
+  // * Verify test fails
+  // * Implement fix in SearchBar to make test pass
 
   it('should display warning if the user enters spaces and no value', () => {
     // what if a user enters a string of just spaces
     // create a test for the failing condition
     // then fix it
     const onSearch = jest.fn();
-    expect(1).toBe(1);
+
+    expect(onSearch).not.toBeCalled();
   });
 });
