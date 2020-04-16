@@ -3,6 +3,18 @@
 - Unit tests are located in the `src/__tests__` folder
 - Will cover some core unit testing / jest concepts without React first
 - Then cover unit testing React Components, and using [react testing library](https://testing-library.com/docs/react-testing-library/intro)
+- Rough speaker / teacher notes - [here](https://www.notion.so/evanjustevan/Bridge-Unit-Testing-Workshop-407d870ded3849a193626f89d3fb3ada)
+
+**note** - most unit tests are currently empty, after the workshop I will push up a branch that has all of them working for reference.
+
+
+
+
+
+
+
+
+
 
 ## (deprecated) Exercise Details
 
