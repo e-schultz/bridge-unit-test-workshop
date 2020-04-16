@@ -8,6 +8,14 @@ const findProductName = (productId, products) => {
     : `product not found for productId: ${productId}`;
 };
 
+const findCategoryName = (categoryId, categories) => {
+  // return 'deprecated pretend we deleted';
+  const category = categories.find((category) => category.id === categoryId);
+  return category
+    ? category.categoryDescription
+    : `categoryId not found for categoryId: ${categoryId}`;
+};
+
 const sortByCost = (a, b) => a.cost - b.cost;
 
 const sortInventory = (items) => {
@@ -24,6 +32,16 @@ const getProductsWithName = (items, products) => {
   });
 };
 
+const getProducstWithCategoryName = (items, departments) => {
+  // const productMap = arrayToMap('id', 'description', products);
+  return items.map((item) => {
+    return {
+      ...item,
+      department: findCategoryName(item.categoryId, departments),
+    };
+  });
+};
+
 const getProductsWithNameX = (items, products) => {
   const productMap = arrayToMap('id', 'description', products);
   return items.map((item) => {
@@ -34,21 +52,25 @@ const getProductsWithNameX = (items, products) => {
   });
 };
 
-const getCheapestAndMostExpensiveByCategory = (categoryId, data) => {
-  const { inventory } = data;
-  // we don't want to mutate the source array
-  const sorted = sortInventory(inventory);
-  const filtered = filterByCategory(categoryId, sorted);
-  const filteredWithName = getProductsWithName(filtered, data.products);
-
-  return [filteredWithName[0], filteredWithName[filteredWithName.length - 1]];
-};
-
 const filterByCategory = (categoryId, items) => {
   return items.filter((item) => item.categoryId === categoryId);
 };
 
-const arrayToMap = (keyProp, valueProp, array) => {
+/*
+Converts an array with objects like:
+[{
+    id: '_1',
+    description: 'Text'
+}]
+
+into an object, with the keyProp being the value to turn into the key, and valueProp the property
+to be used as a value.
+
+{
+    _1: 'Text'
+}
+ */
+const arrayToMap = (keyProp = 'id', valueProp = 'description', array) => {
   const itemMap = array.reduce((acc, value) => {
     return { ...acc, [value[keyProp]]: value[valueProp] };
   }, {});
@@ -63,6 +85,16 @@ const getCategoryMap = (categories) => {
   return arrayToMap('id', 'categoryDescription', categories);
 };
 
+const getCheapestAndMostExpensiveByCategory = (categoryId, data) => {
+  const { inventory } = data;
+  // we don't want to mutate the source array
+  const sorted = sortInventory(inventory);
+  const filtered = filterByCategory(categoryId, sorted);
+  const filteredWithName = getProductsWithName(filtered, data.products);
+
+  return [filteredWithName[0], filteredWithName[filteredWithName.length - 1]];
+};
+
 const getCheapestAndMostExpensiveByCategoryX = (categoryId, data) => {
   const { inventory } = data;
   const productMap = getProductMap(data.products);
@@ -72,7 +104,7 @@ const getCheapestAndMostExpensiveByCategoryX = (categoryId, data) => {
   const sortedInventory = [...inventory]
     .filter((item) => item.categoryId === categoryId)
     .sort((a, b) => a.cost - b.cost)
-    .map((item) => ({ ...item, description: productMap[item.id] }));
+    .map((item) => ({ ...item, description: productMap[item.productId] }));
 
   return [sortedInventory[0], sortedInventory[sortedInventory.length - 1]];
 };
@@ -104,3 +136,23 @@ export {
   getProductsByCategory,
   getProductIdsByCategory,
 };
+
+/*
+Update to get the categoryName
+const getCheapestAndMostExpensiveByCategory = (categoryId, data) => {
+  const { inventory } = data;
+  // we don't want to mutate the source array
+  const sorted = sortInventory(inventory);
+  const filtered = filterByCategory(categoryId, sorted);
+  const filteredWithName = getProductsWithName(filtered, data.products);
+  const filteredWithCategoryName = getProducstWithCategoryName(
+    filteredWithName,
+    data.categories
+  );
+  
+  return [
+    filteredWithCategoryName[0],
+    filteredWithCategoryName[filteredWithCategoryName.length - 1],
+  ];
+};
+*/

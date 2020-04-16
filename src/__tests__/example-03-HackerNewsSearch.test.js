@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 //import '@testing-library/jest-dom/extend-expect';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import TestRenderer from 'react-test-renderer';
-import HackerNewsSearch from './HackerNewsSearch';
-import HackerNewsSearchX from './HackerNewsSearchCls';
+import HackerNewsSearch from '../components/HackerNewsSearch';
+import HackerNewsSearchX from '../components/HackerNewsSearchCls';
 import axios from 'axios';
 jest.mock('axios');
 jest.useFakeTimers();
@@ -15,16 +15,17 @@ jest.mock('./SearchResultList.js', () => {
 });
 */
 describe('the hacker news search', () => {
+  // how can we see what the render markup will look like?
+  // bug using the debug that is returned by render
+  // element.debug();
+  // we can import '@testing-library/jest-dom/extend-expect';
+  // to extend expect with helpers to make common things easier
+
   test('should display a placeholder while waiting for the results', async () => {
     const promise = Promise.resolve();
     axios.get.mockResolvedValueOnce({ data: { hits: [] } });
     const { getByTestId } = render(<HackerNewsSearch query="react" />);
-    // how can we see what the render markup will look like?
-    // bug using the debug that is returned by render
-    // element.debug();
-    // we can import '@testing-library/jest-dom/extend-expect';
-    // to extend expect with helpers to make common things easier
-    //
+
     expect(getByTestId('loadingPlaceholder')).toHaveTextContent(
       '...... please wait while searching for react'
     );
@@ -48,15 +49,15 @@ describe('the hacker news search', () => {
       },
     });
     const { getByLabelText } = render(<HackerNewsSearch query="react" />);
+
     // advance the timers by a second to kick off the first request
     act(() => jest.advanceTimersByTime(1000));
 
     expect(await screen.findByText(/some title/i)).toBeInTheDocument();
+
     const link = getByLabelText(/read more about some title/i);
+
     expect(link).toHaveTextContent('some title');
     expect(link).toHaveAttribute('href', 'https://someurl.com');
-
-    // this is currently making an API call
-    // which will not complete in our tests - we need to mock out axios
   });
 });

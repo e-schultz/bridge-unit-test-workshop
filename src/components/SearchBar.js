@@ -7,7 +7,8 @@ function SearchBar({ initialQuery = '', onSearch }) {
 
   let handleSubmit = (event) => {
     event.preventDefault();
-    if (query.trim().length === 0) {
+
+    if (query.length === 0) {
       setShowError(true);
     } else {
       setShowError(false);

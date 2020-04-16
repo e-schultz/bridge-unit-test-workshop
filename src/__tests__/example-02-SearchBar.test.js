@@ -3,29 +3,25 @@ import ReactDOM from 'react-dom';
 import TestUtils from 'react-dom/test-utils';
 import { act, fireEvent, render } from '@testing-library/react';
 import TestRenderer from 'react-test-renderer';
-import SearchBar from './SearchBar';
-import SearchBarX from './SearchBarCls';
+import SearchBar from '../components/SearchBar';
+import SearchBarX from '../components/SearchBarCls';
 
 describe('Search Bar Functionality', () => {
+  // For component unit tests - we will need to render the component,
+  // we can do this using React.render and attaching it to a div element
   test('should set the search input field to the provided initialQuery', () => {
-    // For component unit tests - we will need to render the component,
-    // we can do this using React.render and attaching it to a div element
     const div = document.createElement('div');
+    const expected = 'Initial Query';
     ReactDOM.render(<SearchBar initialQuery="Initial Query" />, div);
-    expect(div.querySelector('[data-test-id=search-query]').value).toBe(
-      'Initial Query'
-    );
+    const actual = div.querySelector('[data-test-id=search-query]').value;
+    expect(actual).toBe(expected);
   });
 
-  // ReactDOM.render will return a HTML element/document fragment - and we
-  // can use query selectors to query the dom and validate the values
-  // however, using react-testing-library - some of the boilerplate
-  // can be simplified, and also get extra functionality
+  // using react-testing-lib, we get a few helpers to help reduce the boilerplate, and also
+  // a number of queries to make it easy to access the dom, and give us more useful
+  // error messages
 
   test.skip('should set the search input field to the provided initialQuery - react testing lib', () => {
-    // using react-testing-lib, we get a few helpers to help reduce the boilerplate, and also
-    // a number of queries to make it easy to access the dom, and give us more useful
-    // error messages
     const { getByTestId } = render(<SearchBar initialQuery="Initial Query" />);
     // on the first run, this should fail - we used the wrong
     // attribute for the data-test-id
@@ -87,6 +83,11 @@ describe('Search Bar Functionality', () => {
     expect(onSearch).toHaveBeenCalledWith('New Search');
   });
 
+  // if we change this to a functional component that uses hooks
+  // instead of a class based one - there is no longer an an `instance` to return
+  // note: update App.js to use the class based version of the SearchBar component
+  // if we view in the browser - things are breaking, but the unit test is still passing
+
   test.skip('should avoid testing implementation details 2', () => {
     const div = document.createElement('div');
     const onSearch = jest.fn();
@@ -95,20 +96,18 @@ describe('Search Bar Functionality', () => {
       <SearchBarX onSearch={onSearch} initialQuery="Initial Query" />,
       div
     );
-    // if we change this to a functional component that uses hooks
-    // instead of a class based one - there is no longer an an `instance` to return
-    // note: update App.js to use the class based version of the SearchBar component
-    // if we view in the browser - things are breaking, but the unit test is still passing
 
     let input = div.querySelector('input');
 
     TestUtils.Simulate.change(input, { target: { value: 'New Search' } });
     TestUtils.Simulate.submit(input, {});
-    //// testRenderer.getInstance().setQuery('New Search');
+
+    // testRenderer.getInstance().setQuery('New Search');
     // testRenderer.getInstance().handleSubmit({ preventDefault: () => {} });
 
     expect(onSearch).toHaveBeenCalledWith('New Search');
   });
+
   it('should display warning if the search field is blank', () => {
     const onSearch = jest.fn();
 
@@ -131,24 +130,17 @@ describe('Search Bar Functionality', () => {
     expect(onSearch).not.toBeCalled();
   });
 
+  // if a user only enters spaces, we want to treat that as a empty
+  // and not allow them to submit the search
+  // Step 1. Write a test that sets the value to an empty string of spaces & submits it
+  // Verify that the test is failing
+  // Step 2. Fix the handleSubmit to account for empty strings, and get the test passing
+
   it('should display warning if the user enters spaces and no value', () => {
     // what if a user enters a string of just spaces
     // create a test for the failing condition
     // then fix it
     const onSearch = jest.fn();
-
-    const { getByLabelText } = render(
-      <SearchBar initialQuery="Initial Query" onSearch={onSearch} />
-    );
-
-    fireEvent.change(getByLabelText(/search:/i), {
-      target: { value: ' ' },
-    });
-    fireEvent.submit(getByLabelText(/search:/i));
-
-    expect(getByLabelText('search-term-required')).toHaveTextContent(
-      'Please enter search field'
-    );
-    expect(onSearch).not.toBeCalled();
+    expect(1).toBe(1);
   });
 });
