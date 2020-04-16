@@ -1,10 +1,20 @@
-# React Hooks - Refactor Exercise - Solution
+# Bridge Unit Testing Workshop / Presentation
+
+- Unit tests are located in the `src/__tests__` folder
+- Will cover some core unit testing / jest concepts without React first
+- Then cover unit testing React Components, and using [react testing library](https://testing-library.com/docs/react-testing-library/intro)
+
+## (deprecated) Exercise Details
+
+note: The base of this repo was taken from an exercise from another training session which was to make a 'hacker news' search.
+
+If you are curious about that training, and more details for the exercise that produced this repo, please check [https://github.com/e-schultz/ts-js-react-training](https://github.com/e-schultz/ts-js-react-training)
 
 This exercise is based on one of the previous data-fetch examples.
 
 Modify `src/components/SearchBar.js` to use the `useState` hook instead of being a component that extends from `React.Component`
 
-## API Response Notes
+### API Response Notes
 
 The result from the API contains quite a bit of data. The full schema is blow, however, the key values we care about are the hits array, which is the result object.
 
@@ -34,7 +44,7 @@ For this practice, we only care about:
 }
 ```
 
-## Full API Response
+### Full API Response
 
 ```json
 {
