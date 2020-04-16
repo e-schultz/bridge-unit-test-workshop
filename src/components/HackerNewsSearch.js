@@ -10,6 +10,7 @@ function HackerNewsSearch({ query }) {
   const [isLoading, setIsLoading] = useState(true);
   const [results, setResults] = useState([]);
   useEffect(() => {
+    console.log('yo', query);
     setIsLoading(true);
     axios
       .get(`${API}query=${query}`)
@@ -47,7 +48,7 @@ function HackerNewsSearch({ query }) {
 }
 
 export default HackerNewsSearch;
-
+export { API };
 /* ---- code down here is for snippets / copy-paste as I go through examples
  
 SearchResults before component:
