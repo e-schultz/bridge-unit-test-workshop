@@ -108,13 +108,14 @@ const getCheapestAndMostExpensiveByCategory = (categoryId, data) => {
 const getCheapestAndMostExpensiveByCategoryX = (categoryId, data) => {
   const { inventory } = data;
   const productMap = getProductMap(data.products);
-
+  const categoryMap = getCategoryMap(data.categories);
   const sortedInventory = [...inventory]
     .filter((item) => item.categoryId === categoryId)
     .sort((a, b) => a.cost - b.cost)
     .map((item) => ({
       ...item,
       description: productMap[item.productId],
+      category: categoryMap[item.categoryId],
     }));
 
   return [sortedInventory[0], sortedInventory[sortedInventory.length - 1]];
@@ -142,7 +143,7 @@ const getProductIdsByCategory = (categoryId, data) => {
 export {
   getCheapestAndMostExpensiveByCategory,
   getCheapestAndMostExpensiveByCategoryX,
-  findProductName,
+  // findProductName,
   arrayToMap,
   getProductsByCategory,
   getProductIdsByCategory,

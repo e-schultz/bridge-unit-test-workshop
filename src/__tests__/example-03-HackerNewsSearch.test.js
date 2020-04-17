@@ -37,6 +37,9 @@ jest.mock('./SearchResultList.js', () => {
 // axios - how can we handle this and not have to call the actual API?
 
 describe('the hacker news search', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
   // how can we see what the render markup will look like?
   // bug using the debug that is returned by render
   // element.debug();
@@ -49,7 +52,15 @@ describe('the hacker news search', () => {
   // * check if there is text content
   // extra resource: // https://kentcdodds.com/blog/fix-the-not-wrapped-in-act-warning
   test('should display a placeholder while waiting for the results', async () => {
-    expect(1).toBe(1);
+    const promise = Promise.resolve();
+    axios.get.mockResolvedValueOnce({ data: { hits: [] } });
+
+    const { getByTestId } = render(<HackerNewsSearch query="react" />);
+
+    expect(getByTestId('loadingPlaceholder')).toHaveTextContent(
+      '...... please wait while searching for react'
+    );
+    await act(() => promise);
   });
 
   // Once we have the data from the API, we want to verify that it is displayed on
@@ -62,7 +73,25 @@ describe('the hacker news search', () => {
   // To help with this, we will also need to use jests fake timers.
 
   test('should display results once returned from the API', async () => {
-    expect(1).toBe(1);
+    axios.get.mockResolvedValueOnce({
+      data: {
+        hits: [
+          {
+            url: 'https://someurl.com',
+            title: 'some title',
+            objectID: '123456',
+          },
+        ],
+      },
+    });
+    const { getByLabelText } = render(<HackerNewsSearch query="react" />);
+
+    act(() => jest.advanceTimersByTime(0));
+    expect(await screen.findByText(/some title/i)).toBeInTheDocument();
+
+    const link = getByLabelText(/read more about some title/i);
+    expect(link).toHaveTextContent('some title');
+    expect(link).toHaveAttribute('href', 'https://someurl.com');
   });
 
   // Sometimes it can be useful to verify that we are calling the correct
@@ -73,12 +102,30 @@ describe('the hacker news search', () => {
   // * Create a test to mount the component with a search term
   // * verify that it has been called with the correct URL
   test('should call the API with the search term provided', async () => {
-    expect(1).toBe(1);
+    const promise = Promise.resolve();
+    axios.get.mockResolvedValueOnce({ data: { hits: [] } });
+    render(<HackerNewsSearch query="react" />);
+    expect(axios.get).toHaveBeenCalledWith(`${API}query=react`);
+    await act(() => promise);
   });
 
   test('should query the api with a new term if the provided query changes', async () => {
     const promise = Promise.resolve();
-    expect(1).toBe(1);
+    const mockData = {
+      data: {
+        hits: [],
+      },
+    };
+
+    axios.get.mockResolvedValueOnce(mockData).mockResolvedValueOnce(mockData);
+    const { rerender } = render(<HackerNewsSearch query="react" />);
+    rerender(<HackerNewsSearch query="redux" />);
+
+    expect(axios.get).toHaveBeenCalledWith(`${API}query=react`);
+    expect(axios.get).toHaveBeenCalledWith(`${API}query=redux`);
+
+    expect(axios.get.mock.calls[0][0]).toBe(`${API}query=react`);
+    expect(axios.get.mock.calls[1][0]).toBe(`${API}query=redux`);
     await act(() => promise);
   });
 });
