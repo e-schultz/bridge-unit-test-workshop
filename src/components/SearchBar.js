@@ -7,7 +7,7 @@ function SearchBar({ initialQuery = '', onSearch }) {
 
   let handleSubmit = (event) => {
     event.preventDefault();
-
+    //onSearch(query);
     if (query.trim().length === 0) {
       setShowError(true);
     } else {
@@ -21,9 +21,11 @@ function SearchBar({ initialQuery = '', onSearch }) {
         <label htmlFor="search-query">Search:</label>
         <input
           id="search-query"
-          data-test-id="search-query"
+          data-testid="search-query"
           value={query}
-          onChange={(evt) => setQuery(evt.target.value)}
+          onChange={(evt) => {
+            setQuery(evt.target.value);
+          }}
         />
 
         <button type="submit">Search</button>
@@ -36,3 +38,8 @@ function SearchBar({ initialQuery = '', onSearch }) {
 }
 
 export default SearchBar;
+/*
+  {showError ? (
+          <div aria-label="Search Field Errors">Please enter a search term</div>
+        ) : null}
+        */

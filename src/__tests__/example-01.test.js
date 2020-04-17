@@ -73,14 +73,35 @@ describe('avoid testing implementation details', () => {
   // Knowing this, we can arrange our test to verify that those are the results
   // that get returned.
   test('should get the cheapest and most expensive item', () => {
-    // TODO: implement
-    expect(1).toEqual(1);
+    // arrange
+    const expectedMin = {
+      id: 1,
+      categoryId: 1,
+      quantity: 1,
+      productId: 1,
+      cost: 1,
+      description: 'Apples',
+    };
+    const expectedMax = {
+      id: 2,
+      categoryId: 1,
+      quantity: 10,
+      productId: 2,
+      cost: 2,
+      description: 'Banannas',
+    };
+    // act
+    const [min, max] = getCheapestAndMostExpensiveByCategory(1, DATA);
+
+    // assert (expect)
+    expect(min).toEqual(expectedMin);
+    expect(max).toEqual(expectedMax);
   });
 
   // for the 'helper' functions - should we export those to make them easier to test?
   // lets look at `findProductName` for example
 
-  test('should return the description of an item matching the product id', () => {
+  test.skip('should return the description of an item matching the product id', () => {
     const expected = 'Banannas';
     const actual = findProductName(2, DATA.products);
     expect(actual).toEqual(expected);
@@ -102,7 +123,7 @@ describe('avoid testing implementation details', () => {
    even though the behaviour we care about remains the same
   */
 
-  test('should also get the cheapest and most product with product name', () => {
+  test.skip('should also get the cheapest and most product with product name', () => {
     /*
      for example - getCheapestAndMostExpensiveByCategoryX
      is a different implementation of the same functionality, but does not use many/any of the same
@@ -141,18 +162,26 @@ describe('avoid testing implementation details', () => {
   // Which function would there be more value in writing a unit test for?
 
   test('should convert an array to an object, using the provided keyProp and valueProp', () => {
-    const expected = 1;
-    const actual = 1;
-    // TODO: proper test for arrayToMap 
+    const array = [
+      { someId: '_1234', someValue: 'My Value 1' },
+      { someId: '_1235', someValue: 'My Value 2' },
+    ];
+    const expected = {
+      _1234: 'My Value 1',
+      _1235: 'My Value 2',
+    };
+    const actual = arrayToMap('someId', 'someValue', array);
+
+    // TODO: proper test for arrayToMap
     // what is the expected input?
     // what is the expected output?
-    expect(actual).toEqual(actual);
+    expect(actual).toEqual(expected);
   });
 
   // How do we handle a situation where the data returned, might have
   // more information than we need to validate our test case?
   //
-  // This can happen if requirements change, that may cause 
+  // This can happen if requirements change, that may cause
   // additional data to be added to an object, and while writing
   // tests for that new functionality can be useful, it can also
   // cause existing tests to fail.
@@ -160,31 +189,25 @@ describe('avoid testing implementation details', () => {
   // we can use partial matchers to help solve this,
   // https://jestjs.io/docs/en/expect#expectobjectcontainingobject
   //
-  // To show this, we will update `getCheapestAndMostExpensiveByCategoryX` 
+  // To show this, we will update `getCheapestAndMostExpensiveByCategoryX`
   // to add the category name to the returned object.
-  test('partial matchers', () => {
-   
+  test('partial matchers - verify cheap and expensive', () => {
     const expectedMin = {
       id: 1,
-      categoryId: 1,
-      quantity: 1,
       productId: 1,
       cost: 1,
-      description: 'Apples',
     };
     const expectedMax = {
       id: 2,
-      categoryId: 1,
-      quantity: 10,
       productId: 2,
       cost: 2,
-      description: 'Banannas',
     };
     const [min, max] = getCheapestAndMostExpensiveByCategoryX(1, DATA);
 
-    expect(min).toEqual(expectedMin);
-    expect(max).toEqual(expectedMax);
-
+    expect(min).toEqual(expect.objectContaining(expectedMin));
+    expect(max).toEqual(expect.objectContaining(expectedMax));
+    // expect(min).toEqual(expectedMin);
+    // expect(max).toEqual(expectedMax);
   });
 });
 

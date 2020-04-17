@@ -16,7 +16,7 @@ describe('Search Bar Functionality', () => {
     const div = document.createElement('div');
     const expected = 'Initial Query';
     ReactDOM.render(<SearchBar initialQuery="Initial Query" />, div);
-    const actual = div.querySelector('[data-test-id=search-query]').value;
+    const actual = div.querySelector('[data-testid=search-query]').value;
     expect(actual).toBe(expected);
   });
 
@@ -33,9 +33,11 @@ describe('Search Bar Functionality', () => {
   // * getByTestId: - https://testing-library.com/docs/dom-testing-library/api-queries#bytestid
   test('should set the search input field to the provided initialQuery - react testing lib', () => {
     const expected = 'Initial Query';
+    const { getByTestId, debug } = render(
+      <SearchBar initialQuery="Initial Query" />
+    );
 
-    // TODO: complete test, and make use of getByTestId and render
-    const actual = 'Initial Query';
+    const actual = getByTestId('search-query').value;
 
     expect(actual).toBe(expected);
   });
@@ -51,7 +53,13 @@ describe('Search Bar Functionality', () => {
   //
   test('should update the input as the user types', () => {
     const expected = 'New Value';
-    const actual = 'New Value';
+    const { getByLabelText } = render(
+      <SearchBar initialQuery="Initial Query" />
+    );
+
+    const field = getByLabelText(/search/i);
+    fireEvent.change(field, { target: { value: expected } });
+    const actual = field.value;
     expect(actual).toEqual(expected);
   });
 
@@ -67,9 +75,12 @@ describe('Search Bar Functionality', () => {
   test('should call the provided onSearch callback when the form is submitted with the input value', () => {
     const onSearch = jest.fn();
 
-    onSearch('Initial Query');
+    const { getByTestId } = render(
+      <SearchBar initialQuery="Initial Query" onSearch={onSearch} />
+    );
 
-    expect(onSearch).toHaveBeenCalled();
+    fireEvent.submit(getByTestId('search-form'), { preventDefault: () => {} });
+
     expect(onSearch).toHaveBeenCalledWith('Initial Query');
   });
 
@@ -156,8 +167,18 @@ describe('Search Bar Functionality', () => {
   it('should display warning if the search field is blank', () => {
     const onSearch = jest.fn();
 
-    // implement test
+    const { getByLabelText } = render(
+      <SearchBar initialQuery="Initial Query" onSearch={onSearch} />
+    );
 
+    fireEvent.change(getByLabelText(/search:/i), {
+      target: { value: '' },
+    });
+    fireEvent.submit(getByLabelText(/search:/i));
+
+    expect(getByLabelText(/search field errors/i)).toHaveTextContent(
+      'Please enter a search term'
+    );
     expect(onSearch).not.toBeCalled();
   });
 
@@ -168,11 +189,20 @@ describe('Search Bar Functionality', () => {
   // * Implement fix in SearchBar to make test pass
 
   it('should display warning if the user enters spaces and no value', () => {
-    // what if a user enters a string of just spaces
-    // create a test for the failing condition
-    // then fix it
     const onSearch = jest.fn();
 
+    const { getByLabelText } = render(
+      <SearchBar initialQuery="Initial Query" onSearch={onSearch} />
+    );
+
+    fireEvent.change(getByLabelText(/search:/i), {
+      target: { value: '  ' },
+    });
+    fireEvent.submit(getByLabelText(/search:/i));
+
+    expect(getByLabelText(/search field errors/i)).toHaveTextContent(
+      'Please enter a search term'
+    );
     expect(onSearch).not.toBeCalled();
   });
 });
